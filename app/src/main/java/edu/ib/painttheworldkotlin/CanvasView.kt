@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup.LayoutParams
 import kotlin.math.abs
+import kotlin.properties.Delegates
 
 class CanvasView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -21,10 +22,35 @@ class CanvasView @JvmOverloads constructor(
     private lateinit var frame: Rect
     private lateinit var extraCanvas: Canvas
 
+    private var colorName : Int = 0
+
+    private val paintRed = Paint().apply {
+        color = Color.RED
+    }
+
+    private val paintGreen = Paint().apply {
+        color = Color.GREEN
+    }
+
+    private val paintBlue = Paint().apply {
+        color = Color.BLUE
+    }
+
+    private val paintWhite = Paint().apply {
+        color = Color.WHITE
+    }
+
+    private val paintBlack = Paint().apply {
+        color = Color.BLACK
+    }
+
+    private val paintMagenta = Paint().apply {
+        color = Color.MAGENTA
+    }
+
     private val brush = Paint().apply {
         isAntiAlias = true
         isDither = true
-        color = Color.MAGENTA
         strokeWidth = 8f
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
@@ -40,7 +66,7 @@ class CanvasView @JvmOverloads constructor(
         if (::bitmap.isInitialized) bitmap.recycle()
         bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         extraCanvas = Canvas(bitmap)
-        frame = Rect(0, 0, width, height)
+        frame = Rect(0, 180, width, height)
 
     }
 
@@ -66,10 +92,14 @@ class CanvasView @JvmOverloads constructor(
     }
 
     private fun touchStart(){
-        path.reset()
-        path.moveTo(pointX, pointY)
-        curX = pointX
-        curY = pointY
+        if(pointY > 180) {
+            path.reset()
+            path.moveTo(pointX, pointY)
+            curX = pointX
+            curY = pointY
+        }else{
+            path.reset()
+        }
     }
 
     private val touchTolerance = ViewConfiguration.get(context).scaledTouchSlop
@@ -78,11 +108,31 @@ class CanvasView @JvmOverloads constructor(
         val dx = abs(pointX - curX)
         val dy = abs(pointY - curY)
 
-        if(dx >= touchTolerance || dy >= touchTolerance){
-            path.quadTo(curX, curY, (pointX + curX) / 2, (pointY + curY) / 2)
-            curX = pointX
-            curY = pointY
-            extraCanvas.drawPath(path, brush)
+        if(pointY > 180) {
+            if (dx >= touchTolerance || dy >= touchTolerance) {
+                path.quadTo(curX, curY, (pointX + curX) / 2, (pointY + curY) / 2)
+                curX = pointX
+                curY = pointY
+                extraCanvas.drawPath(path, brush)
+            }
+        }else if(pointX <= 180){
+            path.reset()
+            colorName = Color.RED
+        }else if(pointX in 190.0..370.0){
+            path.reset()
+            colorName = Color.GREEN
+        }else if(pointX in 380.0..560.0){
+            path.reset()
+            colorName = Color.BLUE
+        }else if(pointX in 570.0..750.0){
+            path.reset()
+            colorName = Color.WHITE
+        }else if(pointX in 760.0..940.0){
+            path.reset()
+            colorName = Color.BLACK
+        }else if(pointX in 950.0..1130.0){
+            path.reset()
+            colorName = Color.MAGENTA
         }
         invalidate()
     }
@@ -94,6 +144,14 @@ class CanvasView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        canvas.drawRect(0.0f, 0.0f, 180.0f, 180.0f, paintRed)
+        canvas.drawRect(190.0f, 0.0f, 370.0f, 180.0f, paintGreen)
+        canvas.drawRect(380.0f, 0.0f, 560.0f, 180.0f, paintBlue)
+        canvas.drawRect(570.0f, 0.0f, 750.0f, 180.0f, paintWhite)
+        canvas.drawRect(760.0f, 0.0f, 940.0f, 180.0f, paintBlack)
+        canvas.drawRect(950.0f, 0.0f, 1130.0f, 180.0f, paintMagenta)
+
+        brush.color = colorName
         canvas.drawBitmap(bitmap, 0f, 0f, null)
         extraCanvas.drawRect(frame, brush)
     }
