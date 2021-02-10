@@ -14,7 +14,6 @@ class CanvasView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-
     var params: LayoutParams
     private var path = Path()
 
@@ -48,6 +47,9 @@ class CanvasView @JvmOverloads constructor(
         color = Color.MAGENTA
     }
 
+    /**
+     * Okresla wyglad pedzla - plynnosc, wielkosc, ksztalt
+     */
     private val brush = Paint().apply {
         isAntiAlias = true
         isDither = true
@@ -60,6 +62,9 @@ class CanvasView @JvmOverloads constructor(
 
     }
 
+    /**
+     * okresla wielkosc okna oraz ramke
+     */
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
 
@@ -75,6 +80,10 @@ class CanvasView @JvmOverloads constructor(
     private var pointX = 0f
     private var pointY = 0f
 
+    /**
+     * odpowiada za reakcje na dotyk ekranu
+     * wywoluje odpowiednie metody
+     */
     override fun onTouchEvent(event: MotionEvent): Boolean {
 
         pointX = event.x
@@ -91,6 +100,9 @@ class CanvasView @JvmOverloads constructor(
         return true
     }
 
+    /**
+     * w momencie dotkniecia ekranu zapisuje wspolrzedne dotkniecia
+     */
     private fun touchStart(){
         if(pointY > 180) {
             path.reset()
@@ -104,6 +116,10 @@ class CanvasView @JvmOverloads constructor(
 
     private val touchTolerance = ViewConfiguration.get(context).scaledTouchSlop
 
+    /**
+     * odpowiada za wykrywanie zmiany koloru poprzez najechanie na odpowiedni kwadrat
+     * umozliwia rysowanie
+     */
     private fun touchMove(){
         val dx = abs(pointX - curX)
         val dy = abs(pointY - curY)
@@ -137,10 +153,16 @@ class CanvasView @JvmOverloads constructor(
         invalidate()
     }
 
+    /**
+     * odpowiada za przerwanie linii, gdy podniesie sie palec
+     */
     private fun touchUp(){
         path.reset()
     }
 
+    /**
+     * odpowiada za wyglad ekranu i rozmieszczenie na nim elementow
+     */
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
